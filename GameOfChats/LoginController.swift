@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import FirebaseAuth
+import Firebase
 
 class LoginController: UIViewController {
     
@@ -26,9 +28,46 @@ class LoginController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitleColor(UIColor.white, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+        
+        button.addTarget(self, action: #selector(handleRegister), for: .touchUpInside)
+        
+        
+        
         return button
     }()
     
+    func handleRegister() {
+        guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text  else {
+            print("Form is not valid")
+                return
+        }
+        
+        
+        Auth.auth().createUser(withEmail: email, password: password, completion: { ( user: User?, errMsg ) in
+            
+            if errMsg != nil {
+                print(errMsg!)
+                return
+            }
+            guard let uid = user?.uid else{
+                return
+            }
+            let ref = Database.database().reference(fromURL: "https://chatapp-c933c.firebaseio.com/")
+            let userReference = ref.child("users").child(uid)
+            let values = ["name": name, "email": email]
+            userReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
+                
+                
+                if err != nil {
+                    print(err!)
+                    return
+                }else{
+                    print("Saved user successfully into Firebase")
+                }
+            })
+            
+        })
+    }
     
     let nameTextField:UITextField = {
         let tf = UITextField()
