@@ -14,7 +14,7 @@ class LoginController: UIViewController {
     
     let inputsContainerView:UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.white
+        view.backgroundColor = UIColor.gray
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 10
         view.layer.masksToBounds = true
@@ -23,7 +23,7 @@ class LoginController: UIViewController {
     
     let loginRegisterButton:UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = UIColor(r: 80, g: 181, b: 161)
+        button.backgroundColor = UIColor.black
         button.setTitle("Register", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitleColor(UIColor.white, for: .normal)
@@ -37,7 +37,7 @@ class LoginController: UIViewController {
     let loginRegisterSegmentedControl:UISegmentedControl = {
         let sc = UISegmentedControl(items: ["Login","Register"])
         sc.translatesAutoresizingMaskIntoConstraints = false
-        sc.tintColor = UIColor.white
+        sc.tintColor = UIColor.black
         sc.selectedSegmentIndex = 1
         sc.addTarget(self, action: #selector(handleLoginRegisterChange), for: .valueChanged)
         return sc
@@ -94,7 +94,7 @@ class LoginController: UIViewController {
         }
         
         
-        Auth.auth().createUser(withEmail: email, password: password, completion: { ( user: User?, errMsg ) in
+        Auth.auth().createUser(withEmail: email, password: password, completion: { ( user, errMsg ) in
             
             if errMsg != nil {
                 print(errMsg!)
@@ -160,20 +160,24 @@ class LoginController: UIViewController {
         return tf
     }()
     
-    let profileImageView:UIImageView = {
+    lazy var profileImageView:UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "gambar")
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleSelectProfileImageView)))
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.hideKeyboardWhenTappedAround()
         
-        view.backgroundColor = UIColor(r: 61, g: 151, b: 151)
+        view.backgroundColor = UIColor.white
         view.addSubview(inputsContainerView)
         view.addSubview(loginRegisterButton)
         view.addSubview(profileImageView)
