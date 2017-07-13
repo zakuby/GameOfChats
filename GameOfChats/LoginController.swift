@@ -128,6 +128,8 @@ class LoginController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.hideKeyboardWhenTappedAround()
+        
         view.backgroundColor = UIColor(r: 61, g: 151, b: 151)
         view.addSubview(inputsContainerView)
         view.addSubview(loginRegisterButton)
@@ -200,6 +202,19 @@ class LoginController: UIViewController {
     }
     override var preferredStatusBarStyle: UIStatusBarStyle{
         return .lightContent
+    }
+}
+
+
+extension UIViewController {
+    
+    func hideKeyboardWhenTappedAround() {
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
+        view.addGestureRecognizer(tap)
+    }
+    
+    func dismissKeyboard() {
+        view.endEditing(true)
     }
 }
 
