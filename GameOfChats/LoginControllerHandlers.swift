@@ -35,8 +35,9 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
             guard let uid = user?.uid else{
                 return
             }
-            let storageRef = Storage.storage().reference().child("myImage.png")
-            if let uploadData = UIImagePNGRepresentation(self.profileImageView.image!){
+            let imageName = NSUUID().uuidString
+            let storageRef = Storage.storage().reference().child("profile_images").child("\(imageName).png")
+            if let uploadData = UIImageJPEGRepresentation(self.profileImageView.image!, 0.1) {
                 storageRef.putData(uploadData, metadata: nil, completion: { (metadata, errMsg) in
                     if errMsg != nil{
                         print(errMsg!)
@@ -44,7 +45,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                     }
                     if let profileImageUrl = metadata?.downloadURL()?.absoluteString{
                         let values = ["name": name, "email": email, "profileImageUrl": profileImageUrl]
-                        self.RegisterUserToDatabase(uid: uid, values: values)
+                        self.RegisterUserToDatabase(uid: uid, values: values as [String : AnyObject])
                     }
                     
                     
@@ -70,6 +71,8 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                 self.nameTextField.text = ""
                 self.emailTextField.text = ""
                 self.passwordTextField.text = ""
+                self.messageController?.LoginsetNavBarTitle()
+                self.dismiss(animated: true, completion: nil)
             }
         })
     }

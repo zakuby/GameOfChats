@@ -11,7 +11,7 @@ import FirebaseAuth
 import Firebase
 
 class LoginController: UIViewController {
-    
+    var messageController: MessagesController?
     let inputsContainerView:UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.white
@@ -84,6 +84,7 @@ class LoginController: UIViewController {
                 return
             }else{
                 print("Login Succes")
+                self.messageController?.LoginsetNavBarTitle()
                 self.dismiss(animated: true, completion: nil)
             }
             
@@ -222,9 +223,9 @@ class LoginController: UIViewController {
         loginRegisterButton.widthAnchor.constraint(equalTo: inputsContainerView.widthAnchor).isActive = true
         loginRegisterButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
     }
-    override var preferredStatusBarStyle: UIStatusBarStyle{
-        return .lightContent
-    }
+//    override var preferredStatusBarStyle: UIStatusBarStyle{
+//        return .blackC
+//    }
 }
 
 
