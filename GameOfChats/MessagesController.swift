@@ -12,7 +12,8 @@ import FirebaseAuth
 
 
 class MessagesController: UITableViewController {
-
+    let cellId = "cellId"
+    var users = [User]()
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -21,16 +22,23 @@ class MessagesController: UITableViewController {
         
         // Do any additional setup after loading the view, typically from a nib.
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
-        
+        tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         
         
         CheckIfUserIsLoggedIn()
         
+        observeMessage()
+        
     }
-    
+    func chatLogController(user: User){
+        let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
+        chatLogController.user = user
+        navigationController?.pushViewController(chatLogController, animated: true)
+    }
     func handleNewMessages(){
         
         let newMessageController = NewMessageController()
+        newMessageController.messageController = self
         let navController = UINavigationController(rootViewController: newMessageController)
         present(navController, animated: true, completion: nil)
     }
@@ -106,7 +114,6 @@ class MessagesController: UITableViewController {
         
         self.navigationItem.titleView = titleView
         
-        
     }
     
     func handleLogout(){
@@ -122,6 +129,57 @@ class MessagesController: UITableViewController {
         present(loginController, animated: true, completion: nil)
         
     }
-
+    
+    var messages = [Messages]()
+    
+    func observeMessage(){
+        let ref = Database.database().reference().child("messages")
+        ref.observe(.childAdded, with: { (snapshot) in
+            if let dictionary = snapshot.value as? [String: AnyObject]{
+                let message = Messages()
+                message.setValuesForKeys(dictionary)
+                self.messages.append(message)
+                DispatchQueue.main.async(execute: {
+                    self.tableView.reloadData()
+                })
+            }
+        }, withCancel: nil)
+    }
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messages.count
+    }
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! UserCell
+        let message = messages[indexPath.row]
+        let user = User()
+        if let toID = message.toId{
+            let ref = Database.database().reference().child("users").child(toID)
+            
+            ref.observe(.value, with: { (snapshot) in
+                if let dictionary = snapshot.value as? [String: AnyObject]{
+                    user.id = snapshot.key
+                    user.setValuesForKeys(dictionary)
+                    self.users.append(user)
+                    cell.textLabel?.text = dictionary["name"] as? String
+                    if let profileImageUrl = dictionary["profileImageUrl"] as? String {
+                        cell.profileImageView.loadImageUsingCache(urlString: profileImageUrl)
+                    }
+                }
+            }, withCancel: nil)
+        }
+        
+        cell.detailTextLabel?.text = message.text
+        return cell
+    }
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 65
+    }
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("woy ")
+        dismiss(animated: true) {
+            let user = self.users[indexPath.row]
+            self.chatLogController(user: user)
+        }
+    }
 }
 

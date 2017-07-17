@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		2F4D11F9517F5CF14E8E6F05 /* Pods_GameOfChats.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4BA3E8EB04BAE26895CA8A1 /* Pods_GameOfChats.framework */; };
 		84307CBD1F186F6600BF8DC6 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84307CBC1F186F6600BF8DC6 /* Extensions.swift */; };
+		84307CBF1F1C5AB800BF8DC6 /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84307CBE1F1C5AB800BF8DC6 /* ChatLogController.swift */; };
+		84307CC11F1C780000BF8DC6 /* Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84307CC01F1C780000BF8DC6 /* Messages.swift */; };
 		84C41FCE1F14B108001CA21A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C41FCD1F14B108001CA21A /* AppDelegate.swift */; };
 		84C41FD01F14B108001CA21A /* MessagesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C41FCF1F14B108001CA21A /* MessagesController.swift */; };
 		84C41FD31F14B108001CA21A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84C41FD11F14B108001CA21A /* Main.storyboard */; };
@@ -25,6 +27,8 @@
 		09287A7D031E0082703C5E0D /* Pods-GameOfChats.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GameOfChats.release.xcconfig"; path = "Pods/Target Support Files/Pods-GameOfChats/Pods-GameOfChats.release.xcconfig"; sourceTree = "<group>"; };
 		55025629BA7C60B82FE2F04E /* Pods-GameOfChats.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GameOfChats.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GameOfChats/Pods-GameOfChats.debug.xcconfig"; sourceTree = "<group>"; };
 		84307CBC1F186F6600BF8DC6 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		84307CBE1F1C5AB800BF8DC6 /* ChatLogController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
+		84307CC01F1C780000BF8DC6 /* Messages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Messages.swift; sourceTree = "<group>"; };
 		84C41FCA1F14B108001CA21A /* GameOfChats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GameOfChats.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84C41FCD1F14B108001CA21A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		84C41FCF1F14B108001CA21A /* MessagesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesController.swift; sourceTree = "<group>"; };
@@ -109,6 +113,7 @@
 				84C41FCF1F14B108001CA21A /* MessagesController.swift */,
 				84E526DB1F174EC40017F421 /* NewMessageController.swift */,
 				84E526E11F176B480017F421 /* LoginControllerHandlers.swift */,
+				84307CBE1F1C5AB800BF8DC6 /* ChatLogController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -117,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				84E526DF1F175D2A0017F421 /* User.swift */,
+				84307CC01F1C780000BF8DC6 /* Messages.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -255,6 +261,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84307CBF1F1C5AB800BF8DC6 /* ChatLogController.swift in Sources */,
+				84307CC11F1C780000BF8DC6 /* Messages.swift in Sources */,
 				84E526E21F176B480017F421 /* LoginControllerHandlers.swift in Sources */,
 				84E526DC1F174EC40017F421 /* NewMessageController.swift in Sources */,
 				84C41FD01F14B108001CA21A /* MessagesController.swift in Sources */,
