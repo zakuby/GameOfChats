@@ -27,7 +27,8 @@ class MessagesController: UITableViewController {
         
         CheckIfUserIsLoggedIn()
         
-        observeMessage()
+        //observeMessage()
+        
         
     }
     func chatLogController(user: User){
@@ -70,6 +71,10 @@ class MessagesController: UITableViewController {
     }
     
     func setupNavBarWithUser(user: User){
+        messages.removeAll()
+        messageDictionary.removeAll()
+        tableView.reloadData()
+        observerUserMessage()
         self.navigationItem.title = user.name
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
@@ -131,20 +136,58 @@ class MessagesController: UITableViewController {
     }
     
     var messages = [Messages]()
+    var messageDictionary = [String: Messages]()
     
-    func observeMessage(){
-        let ref = Database.database().reference().child("messages")
+    func observerUserMessage(){
+        guard let uid = Auth.auth().currentUser?.uid else{
+            return
+        }
+        let ref = Database.database().reference().child("user-messages").child(uid)
         ref.observe(.childAdded, with: { (snapshot) in
-            if let dictionary = snapshot.value as? [String: AnyObject]{
-                let message = Messages()
-                message.setValuesForKeys(dictionary)
-                self.messages.append(message)
-                DispatchQueue.main.async(execute: {
-                    self.tableView.reloadData()
-                })
-            }
-        }, withCancel: nil)
+            let messageID = snapshot.key
+            let messageReference = Database.database().reference().child("messages").child(messageID)
+            messageReference.observeSingleEvent(of: .value, with: { (snapshot) in
+                if let dictionary = snapshot.value as? [String: AnyObject]{
+                    let message = Messages()
+                    message.setValuesForKeys(dictionary)
+                    //self.messages.append(message)
+                    
+                    if let toID = message.toId {
+                        self.messageDictionary[toID] = message
+                        self.messages = Array(self.messageDictionary.values)
+                        self.messages.sort(by: { (message1, message2) -> Bool in
+                            return (message1.timestamp?.intValue)! > (message2.timestamp?.intValue)!
+                        })
+                    }
+                    DispatchQueue.main.async(execute: {
+                        self.tableView.reloadData()
+                    })
+                }
+            })
+        })
     }
+    
+//    func observeMessage(){
+//        let ref = Database.database().reference().child("messages")
+//        ref.observe(.childAdded, with: { (snapshot) in
+//            if let dictionary = snapshot.value as? [String: AnyObject]{
+//                let message = Messages()
+//                message.setValuesForKeys(dictionary)
+//                //self.messages.append(message)
+//                
+//                if let toID = message.toId {
+//                    self.messageDictionary[toID] = message
+//                    self.messages = Array(self.messageDictionary.values)
+//                    self.messages.sort(by: { (message1, message2) -> Bool in
+//                        return (message1.timestamp?.intValue)! > (message2.timestamp?.intValue)!
+//                    })
+//                }
+//                DispatchQueue.main.async(execute: {
+//                    self.tableView.reloadData()
+//                })
+//            }
+//        }, withCancel: nil)
+//    }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
     }
@@ -152,6 +195,14 @@ class MessagesController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! UserCell
         let message = messages[indexPath.row]
         let user = User()
+        
+        if let seconds = message.timestamp?.doubleValue {
+            let timeStampDate = Date(timeIntervalSince1970: seconds)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "HH:mm"
+            cell.timeLabel.text = dateFormatter.string(from: timeStampDate)
+        }
+        
         if let toID = message.toId{
             let ref = Database.database().reference().child("users").child(toID)
             
@@ -174,12 +225,12 @@ class MessagesController: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 65
     }
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("woy ")
-        dismiss(animated: true) {
-            let user = self.users[indexPath.row]
-            self.chatLogController(user: user)
-        }
-    }
+//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        print("woy ")
+//        dismiss(animated: true) {
+//            let user = self.users[indexPath.row]
+//            self.chatLogController(user: user)
+//        }
+//    }
 }
 
