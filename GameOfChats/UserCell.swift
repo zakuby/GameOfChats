@@ -9,6 +9,7 @@
 import UIKit
 
 class UserCell: UITableViewCell {
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         textLabel?.frame = CGRect(x: 64, y: textLabel!.frame.origin.y, width: textLabel!.frame.width, height: textLabel!.frame.height)

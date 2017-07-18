@@ -17,6 +17,7 @@ class MessagesController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        hideKeyboardWhenTappedAround()
         let image = UIImage(named: "note (1)")?.withRenderingMode(.alwaysOriginal)
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(handleNewMessages) )
         
@@ -24,7 +25,8 @@ class MessagesController: UITableViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         
-        
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
         CheckIfUserIsLoggedIn()
         
         //observeMessage()
@@ -167,27 +169,27 @@ class MessagesController: UITableViewController {
         })
     }
     
-//    func observeMessage(){
-//        let ref = Database.database().reference().child("messages")
-//        ref.observe(.childAdded, with: { (snapshot) in
-//            if let dictionary = snapshot.value as? [String: AnyObject]{
-//                let message = Messages()
-//                message.setValuesForKeys(dictionary)
-//                //self.messages.append(message)
-//                
-//                if let toID = message.toId {
-//                    self.messageDictionary[toID] = message
-//                    self.messages = Array(self.messageDictionary.values)
-//                    self.messages.sort(by: { (message1, message2) -> Bool in
-//                        return (message1.timestamp?.intValue)! > (message2.timestamp?.intValue)!
-//                    })
-//                }
-//                DispatchQueue.main.async(execute: {
-//                    self.tableView.reloadData()
-//                })
-//            }
-//        }, withCancel: nil)
-//    }
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let user = User()
+        let message = messages[indexPath.row]
+        guard let toID = message.chatPartnerID() else{
+            return
+        }
+        
+        let ref = Database.database().reference().child("users").child(toID)
+        
+        ref.observe(.value, with: { (snapshot) in
+            guard let dictionary = snapshot.value as? [String: AnyObject] else{
+                return
+            }
+            user.setValuesForKeys(dictionary)
+            user.id = toID
+            self.chatLogController(user: user)
+        }, withCancel: nil)
+        
+        
+    }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
     }
@@ -195,7 +197,6 @@ class MessagesController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! UserCell
         let message = messages[indexPath.row]
         let user = User()
-        
         if let seconds = message.timestamp?.doubleValue {
             let timeStampDate = Date(timeIntervalSince1970: seconds)
             let dateFormatter = DateFormatter()
@@ -203,7 +204,7 @@ class MessagesController: UITableViewController {
             cell.timeLabel.text = dateFormatter.string(from: timeStampDate)
         }
         
-        if let toID = message.toId{
+        if let toID = message.chatPartnerID(){
             let ref = Database.database().reference().child("users").child(toID)
             
             ref.observe(.value, with: { (snapshot) in
@@ -225,12 +226,5 @@ class MessagesController: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 65
     }
-//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        print("woy ")
-//        dismiss(animated: true) {
-//            let user = self.users[indexPath.row]
-//            self.chatLogController(user: user)
-//        }
-//    }
 }
 

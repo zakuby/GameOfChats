@@ -9,13 +9,43 @@
 import UIKit
 import Firebase
 
-class ChatLogController: UICollectionViewController, UITextFieldDelegate {
+class ChatLogController: UICollectionViewController, UITextFieldDelegate,UICollectionViewDelegateFlowLayout {
     
     var user: User?{
         didSet {
             navigationItem.title = user?.name
+            observerMessages()
         }
     }
+    
+    var messages = [Messages]()
+    
+    func observerMessages(){
+        guard let uid = Auth.auth().currentUser?.uid else{
+            return
+        }
+        let userMessageRef = Database.database().reference().child("user-messages").child(uid)
+        userMessageRef.observe(.childAdded, with: { (snapshot) in
+            let messageID = snapshot.key
+            let messageRef = Database.database().reference().child("messages").child(messageID)
+            messageRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                guard let dictionary = snapshot.value as? [String : AnyObject] else{
+                    return
+                }
+                
+                let message = Messages()
+                message.setValuesForKeys(dictionary)
+                if message.chatPartnerID() == self.user?.id {
+                    self.messages.append(message)
+                    DispatchQueue.main.async(execute: {
+                        self.collectionView?.reloadData()
+                    })
+                }
+                
+            }, withCancel: nil)
+        }, withCancel: nil)
+    }
+    let cellId = "cellId"
     
     let inputTextField: UITextField = {
         let enterMessage = UITextField()
@@ -29,11 +59,16 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        hideKeyboardWhenTappedAround()
+        collectionView?.alwaysBounceVertical = true
         collectionView?.backgroundColor = UIColor.white
+        collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         setupInputComponents()
     }
     func setupInputComponents(){
         let containerView = UIView()
+        
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.backgroundColor = UIColor.white
         
@@ -103,6 +138,33 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate {
             recipientUserMessageRef.updateChildValues([messageID: 1])
         }
         inputTextField.text = ""
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var height: CGFloat = 80
+        
+        if let text = messages[indexPath.row].text {
+            height = estimatedFrameForText(text: text).height + 20
+        }
+        
+        return CGSize(width: view.frame.width, height: height)
+        
+    }
+    private func estimatedFrameForText(text: String) -> CGRect{
+        let size = CGSize(width: 200, height: 1000)
+        let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 16)], context: nil)
+    }
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
+        let message = messages[indexPath.row]
+        cell.bubbleView.backgroundColor = Auth.auth().currentUser?.uid == message.fromID ? UIColor.blue : UIColor.gray
+        cell.textView.text = message.text
+        return cell
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

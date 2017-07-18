@@ -18,6 +18,7 @@
 		84C41FD51F14B108001CA21A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 84C41FD41F14B108001CA21A /* Assets.xcassets */; };
 		84C41FD81F14B108001CA21A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84C41FD61F14B108001CA21A /* LaunchScreen.storyboard */; };
 		84C41FE01F14B59C001CA21A /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C41FDF1F14B59C001CA21A /* LoginController.swift */; };
+		84C6F4EA1F1DC40600233AF4 /* ChatMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C6F4E91F1DC40600233AF4 /* ChatMessageCell.swift */; };
 		84DF2B181F15C3A100A9C128 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84DF2B171F15C3A100A9C128 /* GoogleService-Info.plist */; };
 		84E526DC1F174EC40017F421 /* NewMessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E526DB1F174EC40017F421 /* NewMessageController.swift */; };
 		84E526E01F175D2A0017F421 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E526DF1F175D2A0017F421 /* User.swift */; };
@@ -39,6 +40,7 @@
 		84C41FD71F14B108001CA21A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		84C41FD91F14B108001CA21A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84C41FDF1F14B59C001CA21A /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
+		84C6F4E91F1DC40600233AF4 /* ChatMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatMessageCell.swift; sourceTree = "<group>"; };
 		84DF2B171F15C3A100A9C128 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		84E526DB1F174EC40017F421 /* NewMessageController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewMessageController.swift; sourceTree = "<group>"; };
 		84E526DF1F175D2A0017F421 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				847F04251F1C9FB1004866CF /* UserCell.swift */,
+				84C6F4E91F1DC40600233AF4 /* ChatMessageCell.swift */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -182,7 +185,7 @@
 				TargetAttributes = {
 					84C41FC91F14B108001CA21A = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = R4TU3C8Z8A;
+						DevelopmentTeam = DURRR6YUSP;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -279,6 +282,7 @@
 				84C41FD01F14B108001CA21A /* MessagesController.swift in Sources */,
 				84C41FE01F14B59C001CA21A /* LoginController.swift in Sources */,
 				84E526E01F175D2A0017F421 /* User.swift in Sources */,
+				84C6F4EA1F1DC40600233AF4 /* ChatMessageCell.swift in Sources */,
 				84C41FCE1F14B108001CA21A /* AppDelegate.swift in Sources */,
 				847F04261F1C9FB1004866CF /* UserCell.swift in Sources */,
 				84307CBD1F186F6600BF8DC6 /* Extensions.swift in Sources */,
@@ -406,13 +410,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = R4TU3C8Z8A;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = DURRR6YUSP;
 				INFOPLIST_FILE = GameOfChats/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = indosystem.GameOfChats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -422,13 +429,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = R4TU3C8Z8A;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = DURRR6YUSP;
 				INFOPLIST_FILE = GameOfChats/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = indosystem.GameOfChats;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
