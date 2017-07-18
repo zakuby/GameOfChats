@@ -115,29 +115,35 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate,UIColle
     }
     
     func handleSendMessage(){
-        let ref = Database.database().reference().child("messages")
-        let childRef = ref.childByAutoId()
-        let toID = user?.id
-        let fromID = Auth.auth().currentUser?.uid
-        let timestamp = Int(NSDate().timeIntervalSince1970)
-        let values:[String: Any] = ["text":inputTextField.text, "toId": toID, "fromID": fromID, "timestamp": timestamp]
         
-        childRef.updateChildValues(values) { (errorMsg, ref) in
-            if errorMsg != nil {
-                print(errorMsg)
-                return
+        if inputTextField.text != nil || inputTextField.text != ""{
+            let text = inputTextField.text
+            let ref = Database.database().reference().child("messages")
+            let childRef = ref.childByAutoId()
+            let toID = user?.id
+            let fromID = Auth.auth().currentUser?.uid
+            let timestamp = Int(NSDate().timeIntervalSince1970)
+            let values:[String: Any] = ["text":text!, "toId": toID!, "fromID": fromID!, "timestamp": timestamp]
+            
+            childRef.updateChildValues(values) { (errorMsg, ref) in
+                if errorMsg != nil {
+                    print(errorMsg!)
+                    return
+                }
+                
+                let userMessageRef = Database.database().reference().child("user-messages").child(fromID!)
+                
+                let messageID = childRef.key
+                userMessageRef.updateChildValues([messageID: 1])
+                
+                let recipientUserMessageRef = Database.database().reference().child("user-messages").child(toID!)
+                
+                recipientUserMessageRef.updateChildValues([messageID: 1])
             }
-            
-            let userMessageRef = Database.database().reference().child("user-messages").child(fromID!)
-            
-            let messageID = childRef.key
-            userMessageRef.updateChildValues([messageID: 1])
-            
-            let recipientUserMessageRef = Database.database().reference().child("user-messages").child(toID!)
-            
-            recipientUserMessageRef.updateChildValues([messageID: 1])
+            inputTextField.text = nil
         }
-        inputTextField.text = ""
+            
+        
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -156,14 +162,17 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate,UIColle
     }
     private func estimatedFrameForText(text: String) -> CGRect{
         let size = CGSize(width: 200, height: 1000)
+        
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
         return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 16)], context: nil)
     }
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
         let message = messages[indexPath.row]
-        let widhtBubbleView = estimatedFrameForText(text: message.text!).width + 32
-        cell.bubbleView.widthAnchor.constraint(equalToConstant: widhtBubbleView).isActive = true
+        
+        let bubbleViewWidth = estimatedFrameForText(text: message.text!).width + 32
+        
+        
         
         if Auth.auth().currentUser?.uid == message.fromID{
             cell.bubbleView.backgroundColor = UIColor.blue
@@ -174,6 +183,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate,UIColle
             cell.bubbleViewLeftAnchor?.isActive = true
             cell.bubbleViewRightAnchor?.isActive = false
         }
+        cell.bubbleViewWidthAnchor?.constant = bubbleViewWidth
         cell.textView.text = message.text
         return cell
     }
