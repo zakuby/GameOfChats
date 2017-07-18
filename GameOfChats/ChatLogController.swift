@@ -162,7 +162,18 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate,UIColle
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! ChatMessageCell
         let message = messages[indexPath.row]
-        cell.bubbleView.backgroundColor = Auth.auth().currentUser?.uid == message.fromID ? UIColor.blue : UIColor.gray
+        let widhtBubbleView = estimatedFrameForText(text: message.text!).width + 32
+        cell.bubbleView.widthAnchor.constraint(equalToConstant: widhtBubbleView).isActive = true
+        
+        if Auth.auth().currentUser?.uid == message.fromID{
+            cell.bubbleView.backgroundColor = UIColor.blue
+            cell.bubbleViewLeftAnchor?.isActive = false
+            cell.bubbleViewRightAnchor?.isActive = true
+        }else{
+            cell.bubbleView.backgroundColor = UIColor.gray
+            cell.bubbleViewLeftAnchor?.isActive = true
+            cell.bubbleViewRightAnchor?.isActive = false
+        }
         cell.textView.text = message.text
         return cell
     }

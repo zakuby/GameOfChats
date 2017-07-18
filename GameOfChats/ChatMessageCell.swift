@@ -27,20 +27,27 @@ class ChatMessageCell: UICollectionViewCell {
         return bv
     }()
     
+    var bubbleViewRightAnchor: NSLayoutConstraint?
+    var bubbleViewLeftAnchor: NSLayoutConstraint?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         addSubview(bubbleView)
         addSubview(textView)
         
-        bubbleView.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+        bubbleViewRightAnchor = bubbleView.rightAnchor.constraint(equalTo: self.rightAnchor)
+        bubbleViewRightAnchor?.isActive = true
+        
+        bubbleViewLeftAnchor = bubbleView.leftAnchor.constraint(equalTo: self.leftAnchor)
+        bubbleViewLeftAnchor?.isActive = false
+        
         bubbleView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         bubbleView.widthAnchor.constraint(equalToConstant: 200).isActive = true
         bubbleView.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true
         
         textView.rightAnchor.constraint(equalTo: bubbleView.rightAnchor).isActive = true
         textView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-       // textView.widthAnchor.constraint(equalToConstant: 200).isActive = true
         textView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor, constant: 8).isActive = true
         textView.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true
         
