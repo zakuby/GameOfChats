@@ -67,6 +67,22 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate,UIColle
         collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 8, left: 0, bottom: 50, right: 0)
         collectionView?.register(ChatMessageCell.self, forCellWithReuseIdentifier: cellId)
         setupInputComponents()
+        observerKeyboard()
+    }
+    
+    var containerViewBottom: NSLayoutConstraint?
+    
+    
+    func observerKeyboard(){
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: Notification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboaradWillHide), name: Notification.Name.UIKeyboardWillHide, object: nil)
+    }
+    func keyboardWillShow(notification: Notification){
+        let keyboardSize = notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? CGRect
+        containerViewBottom?.constant = -keyboardSize!.height
+    }
+    func keyboaradWillHide(notification: Notification){
+        containerViewBottom?.constant = 0
     }
     func setupInputComponents(){
         let containerView = UIView()
@@ -91,9 +107,10 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate,UIColle
         
         
         containerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         containerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        containerViewBottom = containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        containerViewBottom?.isActive = true
         
         containerView.addSubview(sendButton)
         containerView.addSubview(separatorView)
@@ -118,7 +135,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate,UIColle
     
     func handleSendMessage(){
         
-        if inputTextField.text != nil || inputTextField.text != ""{
+        if inputTextField.text != nil && !(inputTextField.text?.trimmingCharacters(in: .whitespaces).isEmpty)!{
             let text = inputTextField.text
             let ref = Database.database().reference().child("messages")
             let childRef = ref.childByAutoId()
@@ -144,7 +161,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate,UIColle
             }
             inputTextField.text = nil
         }
-            
+        
         
     }
     
@@ -179,8 +196,22 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate,UIColle
         if Auth.auth().currentUser?.uid == message.fromID{
             cell.bubbleView.backgroundColor = UIColor.blue
             cell.bubbleViewLeftAnchor?.isActive = false
+            cell.profileImageView.image = UIImage()
             cell.bubbleViewRightAnchor?.isActive = true
         }else{
+            let toIDref = Database.database().reference().child("users").child(message.fromID!)
+            toIDref.observeSingleEvent(of: .value, with: { (snapshot) in
+                guard let dictionary = snapshot.value as? [String : AnyObject] else{
+                    return
+                }
+                
+                let toUser = User()
+                toUser.setValuesForKeys(dictionary)
+                if let profileImageUrl = toUser.profileImageUrl {
+                    cell.profileImageView.loadImageUsingCache(urlString: profileImageUrl)
+                }
+                
+            })
             cell.bubbleView.backgroundColor = UIColor.gray
             cell.bubbleViewLeftAnchor?.isActive = true
             cell.bubbleViewRightAnchor?.isActive = false

@@ -7,13 +7,48 @@
 //
 
 import UIKit
+import Firebase
 
 class UserCell: UITableViewCell {
+    
+    var message: Messages?{
+        didSet{
+            setupNameAndProfileImage()
+            if let seconds = message?.timestamp?.doubleValue {
+                let timeStampDate = Date(timeIntervalSince1970: seconds)
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "HH:mm"
+                timeLabel.text = dateFormatter.string(from: timeStampDate)
+            }
+            detailTextLabel?.text = message?.text
+        }
+    }
+    
+    
+    private func setupNameAndProfileImage(){
+        if let toID = message?.chatPartnerID(){
+            let ref = Database.database().reference().child("users").child(toID)
+            let user = User()
+            ref.observeSingleEvent(of: .value, with: { (snapshot) in
+                if let dictionary = snapshot.value as? [String: AnyObject]{
+                    user.setValuesForKeys(dictionary)
+                    self.textLabel?.text = user.name
+                    if let profileImageUrl = user.profileImageUrl {
+                        self.profileImageView.loadImageUsingCache(urlString: profileImageUrl)
+                    }
+                }
+            })
+        }
+    }
+    
+    
+    
     
     override func layoutSubviews() {
         super.layoutSubviews()
         textLabel?.frame = CGRect(x: 64, y: textLabel!.frame.origin.y, width: textLabel!.frame.width, height: textLabel!.frame.height)
         detailTextLabel?.frame = CGRect(x: 64, y: detailTextLabel!.frame.origin.y, width: detailTextLabel!.frame.width, height: detailTextLabel!.frame.height)
+        detailTextLabel?.textColor = UIColor.colo
     }
     let profileImageView: UIImageView = {
         let imageView = UIImageView()

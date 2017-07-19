@@ -16,21 +16,13 @@ class MessagesController: UITableViewController {
     var users = [User]()
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        CheckIfUserIsLoggedIn()
         hideKeyboardWhenTappedAround()
         let image = UIImage(named: "note (1)")?.withRenderingMode(.alwaysOriginal)
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(handleNewMessages) )
         
-        // Do any additional setup after loading the view, typically from a nib.
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(handleLogout))
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
-        
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        CheckIfUserIsLoggedIn()
-        
-        //observeMessage()
-        
         
     }
     func chatLogController(user: User){
@@ -39,7 +31,6 @@ class MessagesController: UITableViewController {
         navigationController?.pushViewController(chatLogController, animated: true)
     }
     func handleNewMessages(){
-        
         let newMessageController = NewMessageController()
         newMessageController.messageController = self
         let navController = UINavigationController(rootViewController: newMessageController)
@@ -75,7 +66,9 @@ class MessagesController: UITableViewController {
     func setupNavBarWithUser(user: User){
         messages.removeAll()
         messageDictionary.removeAll()
-        tableView.reloadData()
+        DispatchQueue.main.async(execute: {
+            self.tableView.reloadData()
+        })
         observerUserMessage()
         self.navigationItem.title = user.name
         let titleView = UIView()
@@ -88,9 +81,6 @@ class MessagesController: UITableViewController {
         let profileImageView = UIImageView()
         if let profileImageUrl = user.profileImageUrl {
             profileImageView.loadImageUsingCache(urlString: profileImageUrl)
-            
-        
-            
         }
         
         
@@ -122,7 +112,6 @@ class MessagesController: UITableViewController {
         self.navigationItem.titleView = titleView
         
     }
-    
     func handleLogout(){
         
         do{
@@ -144,6 +133,7 @@ class MessagesController: UITableViewController {
         guard let uid = Auth.auth().currentUser?.uid else{
             return
         }
+        
         let ref = Database.database().reference().child("user-messages").child(uid)
         ref.observe(.childAdded, with: { (snapshot) in
             let messageID = snapshot.key
@@ -152,9 +142,8 @@ class MessagesController: UITableViewController {
                 if let dictionary = snapshot.value as? [String: AnyObject]{
                     let message = Messages()
                     message.setValuesForKeys(dictionary)
-                    //self.messages.append(message)
                     
-                    if let toID = message.toId {
+                    if let toID = message.chatPartnerID() {
                         self.messageDictionary[toID] = message
                         self.messages = Array(self.messageDictionary.values)
                         self.messages.sort(by: { (message1, message2) -> Bool in
@@ -195,32 +184,10 @@ class MessagesController: UITableViewController {
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! UserCell
+        
         let message = messages[indexPath.row]
-        let user = User()
-        if let seconds = message.timestamp?.doubleValue {
-            let timeStampDate = Date(timeIntervalSince1970: seconds)
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "HH:mm"
-            cell.timeLabel.text = dateFormatter.string(from: timeStampDate)
-        }
+        cell.message = message
         
-        if let toID = message.chatPartnerID(){
-            let ref = Database.database().reference().child("users").child(toID)
-            
-            ref.observe(.value, with: { (snapshot) in
-                if let dictionary = snapshot.value as? [String: AnyObject]{
-                    user.id = snapshot.key
-                    user.setValuesForKeys(dictionary)
-                    self.users.append(user)
-                    cell.textLabel?.text = dictionary["name"] as? String
-                    if let profileImageUrl = dictionary["profileImageUrl"] as? String {
-                        cell.profileImageView.loadImageUsingCache(urlString: profileImageUrl)
-                    }
-                }
-            }, withCancel: nil)
-        }
-        
-        cell.detailTextLabel?.text = message.text
         return cell
     }
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
